@@ -23,6 +23,10 @@ class simple-sinatra-app {
             command     => '/usr/bin/bundle install --gemfile=/opt/simple-sinatra-app/app/Gemfile --path=/opt/simple-sinatra-app/app/',
             refreshonly =>  true,
             require     =>  [Exec['get_app'],Package['ruby-bundler']];
+        'set_unicorn':
+            command     =>  "cd ${root_path}/app && rails new unicorn",
+            refreshonly =>  true,
+            require     =>  Exec['get_app', 'install_gem'];
     }
     file {
         "${root_path}":
@@ -52,6 +56,14 @@ class simple-sinatra-app {
             ensure  =>  symlink,
             target  =>  '/etc/nginx/sites-available/simple-sinatra-app.conf',
             notify  =>  Service["${nginx::service}"];
+         "${root_path}/app/unicorn.rb":
+            ensure  =>  present,
+            mode    =>  '0644',
+            source  =>  'puppet:///modules/rea/opt/unicorn.rb',
+            require =>  Exec['set_unicorn'];
+          '/var/log/simple-sinatra-app/':
+            ensure  =>  directory,
+            mode    =>'0755';
     }
     service {
         'simple-sinatra-app':
