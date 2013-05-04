@@ -24,7 +24,7 @@ class simple-sinatra-app {
             refreshonly =>  true,
             require     =>  [Exec['get_app'],Package['ruby-bundler']];
         'set_unicorn':
-            command     =>  "cd ${root_path}/app && rails new unicorn",
+            command     =>  "/usr/bin/rails ${root_path}/app",
             refreshonly =>  true,
             require     =>  Exec['get_app', 'install_gem'];
     }
