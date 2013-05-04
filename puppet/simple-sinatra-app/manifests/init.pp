@@ -37,7 +37,7 @@ class simple-sinatra-app {
             mode    =>  '0644',
             owner   =>  'root',
             group   =>  'root',
-            #source  =>  'puppet:///modules/rea/init/simple-sinatra-init.conf',
+            source  =>  'puppet:///modules/rea/init/simple-sinatra-init.conf',
             require =>  Exec['get_app'];
         '/etc/init.d/simple-sinatra-app':
             ensure  =>  symlink,
@@ -46,7 +46,7 @@ class simple-sinatra-app {
         '/etc/nginx/sites-available/simple-sinatra-app.conf':
             ensure  =>  present,
             mode    =>  '0644',
-            #source  =>  'puppet:///modules/rea/nginx/simple-sinatra-nginx.conf',
+            source  =>  'puppet:///modules/rea/nginx/simple-sinatra-nginx.conf',
             require =>  Package["${nginx::packages}", "${unicorn::packages}"];
         '/etc/nginx/sites-enabled/simple-sinatra-app.conf':
             ensure  =>  symlink,
