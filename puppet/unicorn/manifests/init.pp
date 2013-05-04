@@ -4,8 +4,8 @@ class unicorn {
     case $::operatingsystem {
         'Ubuntu': {
             $packages = 'ruby-bundler'
-         }
-         default: { fail('Unrecognized operating system') }
+        }
+        default: { fail('Unrecognized operating system') }
     }
     package {
         'unicorn':

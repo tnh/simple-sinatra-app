@@ -29,7 +29,7 @@ class simple-sinatra-app {
             require     =>  Exec['get_app', 'install_gem'];
     }
     file {
-        "${root_path}":
+        $root_path:
             ensure  =>  directory,
             mode    =>  '0755';
         "${root_path}/app":
@@ -51,12 +51,12 @@ class simple-sinatra-app {
             ensure  =>  present,
             mode    =>  '0644',
             source  =>  'puppet:///modules/rea/nginx/simple-sinatra-nginx.conf',
-            require =>  Package["${nginx::packages}", "${unicorn::packages}"];
+            require =>  Package[$nginx::packages, $unicorn::packages];
         '/etc/nginx/sites-enabled/simple-sinatra-app.conf':
             ensure  =>  symlink,
             target  =>  '/etc/nginx/sites-available/simple-sinatra-app.conf',
-            notify  =>  Service["${nginx::service}"];
-         "${root_path}/app/unicorn.rb":
+            notify  =>  Service[$nginx::service];
+        "${root_path}/app/unicorn.rb":
             ensure  =>  present,
             mode    =>  '0644',
             source  =>  'puppet:///modules/rea/opt/unicorn.rb',
