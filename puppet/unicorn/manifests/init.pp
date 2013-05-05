@@ -4,6 +4,7 @@ class unicorn {
     case $::operatingsystem {
         'Ubuntu': {
             $packages = 'ruby-bundler'
+            $rails = rails
         }
         default: { fail('Unrecognized operating system') }
     }
@@ -12,6 +13,8 @@ class unicorn {
             ensure      =>  latest,
             provider    =>  gem;
         $packages:
+            ensure      =>  latest;
+        $rails:
             ensure      =>  latest;
     }
 }
