@@ -27,7 +27,7 @@ class simple-sinatra-app {
         'set_unicorn':
             command     =>  "/usr/bin/rails ${root_path}/app",
             refreshonly =>  true,
-            require     =>  Exec['get_app', 'install_gem'];
+            require     =>  [Exec['get_app', 'install_gem'],Package['rails']];
     }
     file {
         $root_path:
