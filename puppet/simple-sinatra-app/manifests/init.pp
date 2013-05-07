@@ -22,6 +22,7 @@ class simple-sinatra-app {
         'install_gem':
             command     => '/usr/bin/bundle install --gemfile=/opt/simple-sinatra-app/app/Gemfile --path=/opt/simple-sinatra-app/app/',
             refreshonly =>  true,
+            notify      =>  Exec['set_unicorn'],
             require     =>  [Exec['get_app'],Package['ruby-bundler']];
         'set_unicorn':
             command     =>  "/usr/bin/rails ${root_path}/app",
