@@ -21,7 +21,7 @@ class rea::passanger {
                     require     => Exec['import_stealthy_monkeys_gpg_key'];
                 'install_httpd_module':
                     command     => '/usr/bin/passenger-install-apache2-module',
-                    refreshonly => true;
+                    refreshonly => true,
                     require     => Package['mod_passenger'];
             }
             package {
@@ -39,7 +39,6 @@ class rea::passanger {
             service {
                 'httpd':
                     ensure  => running,
-                    restart => '/sbin/service httpd reload',
                     require => Package['httpd'];
             }
         }
@@ -51,7 +50,7 @@ class rea::passanger {
                     refreshonly => true;
                 'refresh_package_list':
                     command     => '/usr/bin/apt-get update',
-                    refreshonly => true;
+                    refreshonly => true,
                     require     => File['/etc/apt/sources.list.d/passenger.list'];
             }
             file {
@@ -65,7 +64,7 @@ class rea::passanger {
                 ['ruby', 'ruby-dev', 'rubygems', 'apache2-utils', 'apache2.2-bin', 'apache2.2-common', 'git']:
                     ensure  => latest;
                 'libapache2-mod-passenger':
-                    ensure  => latest;
+                    ensure  => latest,
                     require => File['/etc/apt/sources.list.d/passenger.list'];
                 'bundle':
                     ensure      => latest,
@@ -75,7 +74,6 @@ class rea::passanger {
             service {
                 'apache2':
                     ensure  => running,
-                    restart => '/usr/sbin/service apache2 reload',
                     require => Package['apache2.2-bin'];
             }
         }
