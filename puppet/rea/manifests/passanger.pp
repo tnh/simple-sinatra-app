@@ -25,7 +25,7 @@ class rea::passanger {
                     require     => Package['mod_passenger'];
             }
             package {
-                ['git', 'ruby', 'rubygems', 'ruby-devel', 'gcc-c++', 'curl-devel', 'openssl-devel', 'zlib-devel', 'httpd-devel', 'apr-devel', 'apr-util-devel', 'httpd']:
+                ['git', 'ruby', 'rubygems', 'ruby-devel', 'gcc-c++', 'libcurl-devel', 'openssl-devel', 'zlib-devel', 'httpd-devel', 'apr-devel', 'apr-util-devel', 'httpd']:
                     ensure  => latest;
                 'mod_passenger':
                     ensure  => latest,
