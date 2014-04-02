@@ -39,6 +39,7 @@ class rea::passanger {
             service {
                 'httpd':
                     ensure  => running,
+                    restart => '/sbin/service httpd reload',
                     require => Package['httpd'];
             }
         }
@@ -74,6 +75,7 @@ class rea::passanger {
             service {
                 'apache2':
                     ensure  => running,
+                    restart => '/usr/sbin/service apache2 reload',
                     require => Package['apache2.2-bin'];
             }
         }
