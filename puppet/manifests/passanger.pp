@@ -61,7 +61,7 @@ class rea::passanger {
                     notify  => Exec['refresh_package_list'];
             }
             package {
-                ['ruby', 'ruby-dev', 'rubygems', 'apache2-utils', 'apache2.2-bin', 'apache2.2-common']:
+                ['ruby', 'ruby-dev', 'rubygems', 'apache2-utils', 'apache2.2-bin', 'apache2.2-common', 'git']:
                     ensure  => latest;
                 'libapache2-mod-passenger':
                     ensure  => latest;
