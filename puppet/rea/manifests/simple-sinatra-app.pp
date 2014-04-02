@@ -13,7 +13,7 @@ class rea::simple-sinatra-app {
             refreshonly => true,
             require     => Package['git'],
             notify      => Exec['install_rea'];
-        'install rea':
+        'install_rea':
             command     => 'bundle install --gemfile /opt/simple-sinatra-app/Gemfile',
             refreshonly => true,
             require     => [Package['bundle'],Exec['clone_rea']];
