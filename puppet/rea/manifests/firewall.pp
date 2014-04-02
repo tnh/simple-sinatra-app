@@ -12,7 +12,7 @@ class rea::firewall {
                 '/etc/sysconfig/iptables':
                     ensure  => present,
                     mode    => '0600',
-                    source  => 'file:///modules/rea/firewall/iptables.redhat',
+                    source  => 'puppet:///modules/rea/firewall/iptables.redhat',
                     notify  => Service['iptables'];
             }
             service {
@@ -35,16 +35,16 @@ class rea::firewall {
                 '/etc/iptables':
                     ensure  => present,
                     mode    => '0600',
-                    source  => 'file:///modules/rea/firewall/iptables.ubuntu',
+                    source  => 'puppet:///modules/rea/firewall/iptables.ubuntu',
                     notify  => Exec['fix_rule'];
                 '/etc/network/if-pre-up.d/iptablesload':
                     ensure  => present,
                     mode    => '0755',
-                    source  => 'file:///modules/rea/firewall/iptablesload.ubuntu';
+                    source  => 'puppet:///modules/rea/firewall/iptablesload.ubuntu';
                 '/etc/network/if-post-down.d/iptablessave':
                     ensure  => present,
                     mode    => '0755',
-                    source  => 'file:///modules/rea/firewall/iptablessave.ubuntu';
+                    source  => 'puppet:///modules/rea/firewall/iptablessave.ubuntu';
             }
         }
         default: { fail('Unrecognized operating system') }
