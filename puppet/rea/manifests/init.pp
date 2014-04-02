@@ -3,5 +3,7 @@
 
 class rea {
     #call the parts
+    include rea::firewall
+    include rea::passanger
     include rea::simple-sinatra-app
 }
