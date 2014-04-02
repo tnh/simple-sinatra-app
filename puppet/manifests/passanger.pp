@@ -57,7 +57,7 @@ class rea::passanger {
                 '/etc/apt/sources.list.d/passenger.list':
                     ensure  =>  present,
                     mode    =>  '0644',
-                    content =>  "deb https://oss-binaries.phusionpassenger.com/apt/passenger $::lsbdistcodename main",
+                    content =>  "deb https://oss-binaries.phusionpassenger.com/apt/passenger ${::lsbdistcodename} main",
                     notify  => Exec['refresh_package_list'];
             }
             package {
