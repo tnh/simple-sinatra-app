@@ -3,5 +3,5 @@
 
 class rea {
     #call the parts
-    incluse rea::passanger
+    include rea::simple-sinatra-app
 }
