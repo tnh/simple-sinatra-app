@@ -32,3 +32,7 @@ This module will do the following:
 What can be improved:
 1. This module can be smarter by allowing the pull of the application to be variable, and as result it will be able to install additional ruby on rails application.
 2. The passenger module can be enhance to use NameVirtualHost option for Apache server.
+
+Tested on:
+CentOS 6.4 x64
+Ubuntu 12.04 LTS x64
