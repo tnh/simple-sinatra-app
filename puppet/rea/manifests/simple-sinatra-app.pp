@@ -42,10 +42,15 @@ class rea::simple-sinatra-app {
         }
         'Ubuntu':{
             file {
+                '/etc/apache2/sites-enabled/000-default':
+                    #remove the ubuntu default site
+                    ensure  => absent,
+                    notify  => Service['apache2'];
                 '/etc/apache2/sites-available/rea.conf':
                     ensure  => present,
                     mode    => '0644',
                     require => [Package['apache2.2-common'],File['/var/www/simple-sinatra-app/public']],
+                    notify  => File['/etc/apache2/sites-enabled/000-default'],
                     content => template('rea/httpd/rea.erb');
                 '/etc/apache2/sites-enabled/rea.conf':
                     ensure  => symlink,

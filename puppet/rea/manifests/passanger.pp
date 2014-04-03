@@ -41,16 +41,17 @@ class rea::passanger {
             service {
                 'httpd':
                     ensure  => running,
-                    require => Package['httpd'];
+                    require => Package["$webserver"];
             }
         }
         'Ubuntu': {
-            $webserver = 'apache2.2-bin'
+            $webserver = 'apache2.2-common'
             exec {
                 'import_stealthy_monkeys_gpg_key':
                     command     => '/usr/bin/apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 561F9B9CAC40B2F7',
                     creates     => '/etc/apt/sources.list.d/stealthymonkeys.puppet',
-                    refreshonly => true;
+                    refreshonly => true,
+                    notify  => Exec['refresh_package_list'];
                 'refresh_package_list':
                     command     => '/usr/bin/apt-get update',
                     refreshonly => true,
@@ -61,15 +62,18 @@ class rea::passanger {
                     ensure  =>  present,
                     mode    =>  '0644',
                     content =>  "deb https://oss-binaries.phusionpassenger.com/apt/passenger ${::lsbdistcodename} main",
-                    require => Exec['import_stealthy_monkeys_gpg_key'],
-                    notify  => Exec['refresh_package_list'];
+                    notify => Exec['import_stealthy_monkeys_gpg_key'];
             }
             package {
-                ['ruby', 'ruby-dev', 'rubygems', 'apache2-utils', 'apache2.2-bin', 'apache2.2-common', 'git', 'apt-transport-https', 'ca-certificates']:
+                ["$webserver", 'apache2-utils', 'apache2.2-bin']:
+                    ensure  => latest,
+                    notify  => Service['apache2'];
+                ['ruby', 'ruby-dev', 'rubygems', 'git', 'apt-transport-https', 'ca-certificates']:
                     ensure  => latest;
                 'libapache2-mod-passenger':
                     ensure  => latest,
-                    require => File['/etc/apt/sources.list.d/passenger.list'];
+                    require => File['/etc/apt/sources.list.d/passenger.list'],
+                    notify  => Service['apache2'];
                 'bundle':
                     ensure      => latest,
                     require     => Package['rubygems'],
@@ -78,7 +82,7 @@ class rea::passanger {
             service {
                 'apache2':
                     ensure  => running,
-                    require => Package['apache2.2-common'];
+                    require => Package["$webserver"];
             }
         }
         default: { fail('Unrecognized operating system') }
