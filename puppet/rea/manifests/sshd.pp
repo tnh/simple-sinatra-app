@@ -8,7 +8,7 @@ class rea::sshd {
             $source_file = 'sshd_config.redhat'
         }
         'Ubuntu': {
-            $service_name = 'sshd'
+            $service_name = 'ssh'
             $source_file = 'sshd_config.ubuntu'
         }
         default: { fail('Unrecognized operating system') }

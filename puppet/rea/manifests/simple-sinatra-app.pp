@@ -21,7 +21,8 @@ class rea::simple-sinatra-app {
     file {
         '/var/www/simple-sinatra-app':
             ensure  => directory,
-            mode    => '0755';
+            mode    => '0755',
+            require => Package["$rea::passanger::webserver"];
         '/var/www/simple-sinatra-app/public':
             ensure  => symlink,
             target  => '/opt/simple-sinatra-app/',
@@ -44,13 +45,13 @@ class rea::simple-sinatra-app {
                 '/etc/apache2/sites-available/rea.conf':
                     ensure  => present,
                     mode    => '0644',
-                    require => [Package['apache2.2-bin'],File['/var/www/simple-sinatra-app/public']],
+                    require => [Package['apache2.2-common'],File['/var/www/simple-sinatra-app/public']],
                     content => template('rea/httpd/rea.erb');
                 '/etc/apache2/sites-enabled/rea.conf':
                     ensure  => symlink,
                     target  => '/etc/apache2/sites-available/rea.conf',
                     require => File['/etc/apache2/sites-available/rea.conf'],
-                    notify  => Service['httpd'];
+                    notify  => Service['apache2'];
             }
         }
         default: { fail('Unrecognized operating system') }

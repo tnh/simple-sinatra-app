@@ -9,6 +9,7 @@ class rea::passanger {
 
     case $::operatingsystem {
         'CentOS', 'RedHat': {
+            $webserver = 'httpd'
             exec {
                 'import_stealthy_monkeys_gpg_key':
                     command     => '/bin/rpm --import http://passenger.stealthymonkeys.com/RPM-GPG-KEY-stealthymonkeys.asc',
@@ -19,24 +20,19 @@ class rea::passanger {
                     refreshonly => true,
                     creates     => '/etc/yum.repos.d/passenger.repo',
                     require     => Exec['import_stealthy_monkeys_gpg_key'];
-                'install_httpd_module':
-                    command     => '/usr/bin/passenger-install-apache2-module',
-                    refreshonly => true,
-                    require     => Package['mod_passenger'];
                 'add_httpd_to_startup':
                     command     => '/sbin/chkconfig httpd on',
                     refreshonly => true;
             }
             package {
-                'httpd':
+                "$webserver":
                     ensure  => latest,
                     notify  => Exec['add_httpd_to_startup'];
                 ['git', 'ruby', 'rubygems', 'ruby-devel', 'gcc-c++', 'libcurl-devel', 'openssl-devel', 'zlib-devel', 'httpd-devel', 'apr-devel', 'apr-util-devel']:
                     ensure  => latest;
                 'mod_passenger':
                     ensure  => latest,
-                    require => Exec['install_stealthymonkeys_repo'],
-                    notify  => Exec['install_httpd_module'];
+                    require => Exec['install_stealthymonkeys_repo'];
                 'bundle':
                     ensure      => latest,
                     require     => Package['rubygems'],
@@ -49,6 +45,7 @@ class rea::passanger {
             }
         }
         'Ubuntu': {
+            $webserver = 'apache2.2-bin'
             exec {
                 'import_stealthy_monkeys_gpg_key':
                     command     => '/usr/bin/apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 561F9B9CAC40B2F7',
@@ -64,10 +61,11 @@ class rea::passanger {
                     ensure  =>  present,
                     mode    =>  '0644',
                     content =>  "deb https://oss-binaries.phusionpassenger.com/apt/passenger ${::lsbdistcodename} main",
+                    require => Exec['import_stealthy_monkeys_gpg_key'],
                     notify  => Exec['refresh_package_list'];
             }
             package {
-                ['ruby', 'ruby-dev', 'rubygems', 'apache2-utils', 'apache2.2-bin', 'apache2.2-common', 'git']:
+                ['ruby', 'ruby-dev', 'rubygems', 'apache2-utils', 'apache2.2-bin', 'apache2.2-common', 'git', 'apt-transport-https', 'ca-certificates']:
                     ensure  => latest;
                 'libapache2-mod-passenger':
                     ensure  => latest,
@@ -80,7 +78,7 @@ class rea::passanger {
             service {
                 'apache2':
                     ensure  => running,
-                    require => Package['apache2.2-bin'];
+                    require => Package['apache2.2-common'];
             }
         }
         default: { fail('Unrecognized operating system') }
