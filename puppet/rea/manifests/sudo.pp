@@ -5,11 +5,11 @@ class rea::sudo {
     include rea::users
     file {
         '/etc/sudoers.d/admin':
-            ensure  =>  presnet,
+            ensure  =>  present,
             owner   =>  'root',
             group   =>  'root',
             mode    =>  '0644',
-            require =>  Group['admin'],
+            require =>  Group['rea-admin'],
             source  =>  'puppet:///modules/rea/sudo/admin';
     }
 }

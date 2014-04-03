@@ -23,7 +23,7 @@ class rea::passanger {
                     command     => '/usr/bin/passenger-install-apache2-module',
                     refreshonly => true,
                     require     => Package['mod_passenger'];
-                'add_httpd_to_startup'
+                'add_httpd_to_startup':
                     command     => '/sbin/chkconfig httpd on',
                     refreshonly => true;
             }

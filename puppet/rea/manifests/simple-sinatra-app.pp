@@ -9,7 +9,7 @@ class rea::simple-sinatra-app {
     include rea::passanger
     exec {
         'clone_rea':
-            command     =>  '/usr/bin/git clone https://github.com/tnh/simple-sinatra-app.git /opt/simple-sinatra-app'
+            command     =>  '/usr/bin/git clone https://github.com/tnh/simple-sinatra-app.git /opt/simple-sinatra-app',
             refreshonly => true,
             require     => Package['git'],
             notify      => Exec['install_rea'];
@@ -24,7 +24,7 @@ class rea::simple-sinatra-app {
             mode    => '0755';
         '/var/www/simple-sinatra-app/public':
             ensure  => symlink,
-            target  => '/opt/simple-sinatra-app/'
+            target  => '/opt/simple-sinatra-app/',
             require => File['/var/www/simple-sinatra-app'],
             notify  => Exec['clone_rea'];
     }
@@ -46,7 +46,7 @@ class rea::simple-sinatra-app {
                     mode    => '0644',
                     require => [Package['apache2.2-bin'],File['/var/www/simple-sinatra-app/public']],
                     content => template('rea/httpd/rea.erb');
-                '/etc/apache2/sites-enabled/rea.conf'
+                '/etc/apache2/sites-enabled/rea.conf':
                     ensure  => symlink,
                     target  => '/etc/apache2/sites-available/rea.conf',
                     require => File['/etc/apache2/sites-available/rea.conf'],
