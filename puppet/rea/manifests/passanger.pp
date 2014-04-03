@@ -23,9 +23,15 @@ class rea::passanger {
                     command     => '/usr/bin/passenger-install-apache2-module',
                     refreshonly => true,
                     require     => Package['mod_passenger'];
+                'add_httpd_to_startup'
+                    command     => '/sbin/chkconfig httpd on',
+                    refreshonly => true;
             }
             package {
-                ['git', 'ruby', 'rubygems', 'ruby-devel', 'gcc-c++', 'libcurl-devel', 'openssl-devel', 'zlib-devel', 'httpd-devel', 'apr-devel', 'apr-util-devel', 'httpd']:
+                'httpd':
+                    ensure  => latest,
+                    notify  => Exec['add_httpd_to_startup'];
+                ['git', 'ruby', 'rubygems', 'ruby-devel', 'gcc-c++', 'libcurl-devel', 'openssl-devel', 'zlib-devel', 'httpd-devel', 'apr-devel', 'apr-util-devel']:
                     ensure  => latest;
                 'mod_passenger':
                     ensure  => latest,
