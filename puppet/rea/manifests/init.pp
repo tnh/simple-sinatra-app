@@ -3,6 +3,8 @@
 
 class rea {
     #call the parts
+    include rea::users
+    include rea::sudo
     include rea::firewall
     include rea::passanger
     include rea::simple-sinatra-app
