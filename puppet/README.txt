@@ -2,7 +2,7 @@ This file is how to use Oded Simon puppet module for:
 REA site performance pre-interview task puppet module
 
 Assumptions:
-1. The new server have on of the followings OSs RedHat, CentOS or Ubuntu 
+1. The new server have one of the followings OSs RedHat, CentOS or Ubuntu 
 2. The new server get it IP and DNS setting from DHCP.
 3. The new server can connect to the puppet master server.
 4. The new server have access to the internet for downloading required packages and ruby gems.
@@ -34,5 +34,5 @@ What can be improved:
 2. The passenger module can be enhance to use NameVirtualHost option for Apache server.
 
 Tested on:
-CentOS 6.4 x64
+CentOS 6.5 x64
 Ubuntu 12.04 LTS x64
