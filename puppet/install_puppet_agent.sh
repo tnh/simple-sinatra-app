@@ -34,6 +34,11 @@ then
     echo "confiugre master server is $CHECKMASTER"
     exit 0
 fi
+if [ -z $MASTER ]
+then
+    echo "ERROR:  puppet master is not provided."
+    usage
+fi
 
 #Check the server OS
 if [ ! -f /etc/redhat-release ] && [ ! -f /etc/lsb-release ]
