@@ -15,8 +15,7 @@ write configuration as code recipes in chef / puppet / ansible / babushka  / she
 Expected output
 -------------
 - chef / puppet  / ansible / babushka  / shell scripts that we can use to deploy the following application
-
- 
+- documentation to allow someone else to build a server following your step by step instructions
 
 
 To get this application working locally
