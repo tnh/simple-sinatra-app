@@ -4,8 +4,8 @@ REA site performance pre-interview task puppet module
 How to use
 ==========
 # deploy username hostname
-example: ./deploy john 192.168.1.100
-         ./deploy root 192.168.1.200
+example: ./deploy john@192.168.1.100
+         ./deploy root@192.168.1.200
 
 Assumptions
 ===========

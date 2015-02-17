@@ -1,11 +1,15 @@
 #!/bin/bash
 
+PORT="22"
 INVENTORY=`mktemp`
+
 trap 'myexit; exit' EXIT SIGINT SIGQUIT
 myexit()
 {
-    [ -e $INVENTORY ] && rm $INVENTORY
+    #[ -e $INVENTORY ] && rm $INVENTORY
+    true
 }
+
 
 ansible --version > /dev/null 2>&1
 if [ "$?" != "0" ]; then
@@ -13,27 +17,15 @@ if [ "$?" != "0" ]; then
    exit 1
 fi
 
-if [ -z "$1" -o -z "$2" ]; then
-   echo "Usage: $0 <username> <host>"
+if [ -z "$1" ]; then
+   echo "Usage: $0 <username@host>"
    exit 2
 fi
 
-USER="$1"
-HOST="$2"
-echo "testhost ansible_ssh_user=$1 ansible_ssh_host=$2 ansible_ssh_port=28033" > $INVENTORY
+[ -n "$2" ] && PORT="$2"
 
-OSTYPE=`ansible testhost -i $INVENTORY -k -m setup -a 'filter=ansible_distribution'`
-echo $OSTYPE | grep CentOS > /dev/null 2>&1
-if [ "$?" = "0" ]; then
-    ansible-playbook -i $INVENTORY -k testhost rea.yml
-    exit $?
-fi
+USER=`echo $1 | cut -d@ -f1`
+HOST=`echo $1 | cut -d@ -f2`
 
-cat $OSTYPE | grep Ubuntu > /dev/null 2>&1
-if [ "$?" = "0" ]; then
-   ansible-playbook testhost -i $INVENTORY -k rea.yml
-   exit $?
-fi
-
-echo "Unsupported OS type"
-exit 3
+echo "testhost ansible_ssh_user=$USER ansible_ssh_host=$HOST ansible_ssh_port=$PORT" > $INVENTORY
+ansible-playbook -i $INVENTORY -k rea.yml
