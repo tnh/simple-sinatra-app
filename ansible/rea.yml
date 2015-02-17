@@ -1,0 +1,21 @@
+---
+- name: Deploy simple-sinatra-app with NginX and Unicorn
+  sudo: True
+  hosts: testhost
+  vars:
+    nginx_user: nginx
+    nginx_group: web
+    app_name: simple-sinatra-app
+    app_dir: /var/www/simple-sinatra-app
+    app_git: git://github.com/tnh/simple-sinatra-app.git
+    dirs: ["log", "config", "tmp/sockets", "tmp/pids"]
+
+  tasks:
+    - include: rea-centos.yml
+      when: ansible_distribution == "CentOS"
+    - include: rea-ubuntu.yml
+      when: ansible_distribution == "Ubuntu"
+
+  handlers:
+    - name: restart nginx
+      service: name=nginx state=restarted

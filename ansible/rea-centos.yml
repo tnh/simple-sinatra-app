@@ -1,16 +1,3 @@
----
-- name: Deploy simple-sinatra-app with NginX and Unicorn
-  hosts: testhost
-  sudo: True
-  vars:
-    nginx_user: nginx
-    nginx_group: web
-    app_name: simple-sinatra-app
-    app_dir: /var/www/simple-sinatra-app
-    app_git: git://github.com/tnh/simple-sinatra-app.git
-    dirs: ["log", "config", "tmp/sockets", "tmp/pids"]
-
-  tasks:
     - name: "Add user group {{ nginx_group }}"
       group: name={{ nginx_group }} state=present
 
@@ -71,9 +58,5 @@
       notify:
        - restart nginx
 
-    - name: Apply iptable rules
+    - name: Apply iptables rules
       script: files/iptables.sh
-
-  handlers:
-    - name: restart nginx
-      service: name=nginx state=restarted

@@ -1,16 +1,3 @@
----
-- name: Deploy simple-sinatra-app with NginX and Unicorn
-  hosts: testhost
-  sudo: True
-  vars:
-    nginx_user: nginx
-    nginx_group: web
-    app_name: simple-sinatra-app
-    app_dir: /var/www/simple-sinatra-app
-    app_git: git://github.com/tnh/simple-sinatra-app.git
-    dirs: ["log", "config", "tmp/sockets", "tmp/pids"]
-
-  tasks:
     - name: "Add user group {{ nginx_group }}"
       group: name={{ nginx_group }} state=present
 
@@ -64,8 +51,3 @@
       ufw: proto=tcp port=80 rule=allow
     - name: Set default ufw policy
       ufw: state=enabled direction=incoming policy=deny
-
-  handlers:
-
-    - name: restart nginx
-      service: name=nginx state=restarted
