@@ -1,0 +1,71 @@
+---
+- name: Deploy simple-sinatra-app with NginX and Unicorn
+  hosts: testhost
+  sudo: True
+  vars:
+    nginx_user: nginx
+    nginx_group: web
+    app_name: simple-sinatra-app
+    app_dir: /var/www/simple-sinatra-app
+    app_git: git://github.com/tnh/simple-sinatra-app.git
+    dirs: ["log", "config", "tmp/sockets", "tmp/pids"]
+
+  tasks:
+    - name: "Add user group {{ nginx_group }}"
+      group: name={{ nginx_group }} state=present
+
+    - name: "Add user {{ nginx_user }}"
+      user: name="{{ nginx_user }}" shell=/bin/nologin groups="{{ nginx_group }}"
+
+    - name: Update repo cache
+      apt: update_cache=yes
+
+    - name: Install packages
+      apt: "pkg={{ item }} state=present"
+      with_items: [ "nginx", "git", "iptables", "ufw", "ruby", "ruby-rails"]
+
+    - name: Install unicorn
+      gem: name=unicorn state=present
+
+    - file: dest=/var/www state=directory recurse=yes
+    - name: Clone simple-sinatra-app
+      command: git clone --depth=1 {{ app_git }} chdir=/var/www creates={{ app_dir }}
+    - command: rm -rf {{ app_git }}/.git
+
+    - name: Create directories
+      file: dest={{ app_dir }}/{{ item }} state=directory recurse=yes
+      with_items: [ "log", "config", "tmp/sockets", "tmp/pids", "public" ]
+
+    - name: Configure nginx
+      template: src=files/nginx.conf dest=/etc/nginx/nginx.conf
+
+    - name: Configure unicorn
+      template: src=files/unicorn.conf.rb dest={{ app_dir }}/config/unicorn.rb
+
+    - name: Bundle install
+      command: bundle install chdir={{ app_dir }}
+
+    - name: Check unicorn PID
+      stat: path={{ app_dir }}/tmp/pids/unicorn.pid
+      register: unicorn_pid
+
+    - name: Shutdown unicorn process if already running
+      shell: "cat {{ app_dir }}/tmp/pids/unicorn.pid | xargs kill -9"
+      when: unicorn_pid.stat.exists == True
+
+    - name: Start unicorn
+      command: "unicorn -c {{ app_dir }}/config/unicorn.rb -E deployment -D"
+      notify:
+      - restart nginx
+
+    - name: Allow incoming SSH traffic
+      ufw: proto=tcp port=22 rule=allow
+    - name: Allow incoming WEB traffic
+      ufw: proto=tcp port=80 rule=allow
+    - name: Set default ufw policy
+      ufw: state=enabled direction=incoming policy=deny
+
+  handlers:
+
+    - name: restart nginx
+      service: name=nginx state=restarted
