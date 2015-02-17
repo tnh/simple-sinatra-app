@@ -3,9 +3,9 @@ REA site performance pre-interview task puppet module
 
 How to use
 ==========
-# deploy username hostname
+Usage: deploy <username@hostname> [ssh-port-num]
 example: ./deploy john@192.168.1.100
-         ./deploy root@192.168.1.200
+         ./deploy root@192.168.1.200 23123
 
 Assumptions
 ===========
@@ -31,4 +31,4 @@ TODO
 ====
 1. Implemented a separated ansible automation script for CentOS and Ubuntu. Better if
 merger them to a single script.
-2. Enhance deploy script to support specifiying ssh port and private key file
+2. Enhance deploy script to support specifiying ssh private key file
