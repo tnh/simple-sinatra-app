@@ -1,9 +1,8 @@
-This is a README file for how to scriptuse Tim Feng's provision scripts:
-REA site performance pre-interview task puppet module
+This is a README file for how to use this provision scripts:
 
 How to use
 ==========
-Usage: deploy <username@hostname> [ssh-port-num]
+Usage: deploy <username@hostname> [ssh-port-number]
 example: ./deploy john@192.168.1.100
          ./deploy root@192.168.1.200 23123
 
@@ -30,5 +29,6 @@ Ubuntu 14.04 x86_64
 TODO
 ====
 1. Implemented a separated ansible automation script for CentOS and Ubuntu. Better if
-merger them to a single script.
+merger them to a single script
 2. Enhance deploy script to support specifiying ssh private key file
+3. Improve Ruby version management
