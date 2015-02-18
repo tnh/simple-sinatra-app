@@ -8,7 +8,6 @@
     app_name: simple-sinatra-app
     app_dir: /var/www/simple-sinatra-app
     app_git: git://github.com/tnh/simple-sinatra-app.git
-    dirs: ["log", "config", "tmp/sockets", "tmp/pids"]
 
   tasks:
     - include: rea-centos.yml
