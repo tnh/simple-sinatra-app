@@ -1,31 +1,38 @@
 #!/bin/bash
 
-PORT="22"
-INVENTORY=`mktemp`
-
+# Make sure inventory file is removed at exit
 trap 'myexit; exit' EXIT SIGINT SIGQUIT
 myexit()
 {
-    #[ -e $INVENTORY ] && rm $INVENTORY
-    true
+    [ -e $INVENTORY ] && rm $INVENTORY
 }
 
-
+# Check if Ansible is installed
 ansible --version > /dev/null 2>&1
 if [ "$?" != "0" ]; then
    echo "Please install ansible first"
    exit 1
 fi
 
+# Validate parameters
 if [ -z "$1" ]; then
    echo "Usage: $0 <username@host>"
    exit 2
 fi
 
-[ -n "$2" ] && PORT="$2"
-
 USER=`echo $1 | cut -d@ -f1`
 HOST=`echo $1 | cut -d@ -f2`
+if [ -z $USER -o -z $HOST ]; then
+    echo "Invalid user or host"
+    exit 3
+fi
 
+PORT="22"
+[ -n "$2" ] && PORT="$2"
+
+# Generate ansible inventory file
+INVENTORY=`mktemp`
 echo "testhost ansible_ssh_user=$USER ansible_ssh_host=$HOST ansible_ssh_port=$PORT" > $INVENTORY
+
+# Configure the host
 ansible-playbook -i $INVENTORY -k rea.yml
