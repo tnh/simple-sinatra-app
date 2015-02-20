@@ -1,34 +1,29 @@
 #!/bin/bash
 
-# Make sure inventory file is removed at exit
+# Make sure temporary inventory file is removed before exit
 trap 'myexit; exit' EXIT SIGINT SIGQUIT
 myexit()
 {
-    [ -e $INVENTORY ] && rm $INVENTORY
+    [ -e $INVENTORY ] && rm $INVENTORY > /dev/null 2>&1
 }
 
 # Check if Ansible is installed
 ansible --version > /dev/null 2>&1
-if [ "$?" != "0" ]; then
-   echo "Please install ansible first"
-   exit 1
-fi
+[ "$?" != "0" ] && { echo "Please install ansible first"; exit 1; }
 
 # Validate parameters
-if [ -z "$1" ]; then
-   echo "Usage: $0 <username@host>"
-   exit 2
-fi
+[ -z "$1" ] && { echo "Usage: $0 <username@host>" exit 2; }
 
-USER=`echo $1 | cut -d@ -f1`
-HOST=`echo $1 | cut -d@ -f2`
-if [ -z $USER -o -z $HOST ]; then
-    echo "Invalid user or host"
+# Parse username and hostname
+if [[ "$1" == *"@"* ]]; then
+    USER=`echo $1 | cut -d@ -f1`
+    HOST=`echo $1 | cut -d@ -f2`
+else
+    echo "Invalid username/hostname: $1"
     exit 3
 fi
-
-PORT="22"
-[ -n "$2" ] && PORT="$2"
+[ -z "$USER" -o -z "$HOST" ] && { echo "Invalid user/hostname: $1"; exit 4; }
+[ -n "$2" ] && PORT="$2" || PORT="22"
 
 # Generate ansible inventory file
 INVENTORY=`mktemp`

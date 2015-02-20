@@ -16,16 +16,11 @@
 
     - name: Install packages
       action: "{{ ansible_pkg_mgr }} pkg={{ item }} state=present"
-      with_items: [ "ruby-devel", "rubygems", "rubygem-bundler", "zlib-devel", "which" ]
+      with_items: [ "ruby-devel", "rubygems", "zlib-devel", "which" ]
 
-    - name: Install rails
-      gem: name=rails state=present
-
-    - name: Install unicorn
-      command: gem install unicorn
-
-    - name: Install bundle
-      gem: name=bundle state=present
+    - name: Install Ruby Gems
+      gem: name={{ item }} state=present user_install=no
+      with_items: [ "bundle", "rails", "unicorn" ]
 
     - file: dest=/var/www state=directory recurse=yes
     - name: Clone simple-sinatra-app

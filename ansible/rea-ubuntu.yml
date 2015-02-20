@@ -9,10 +9,12 @@
 
     - name: Install packages
       apt: "pkg={{ item }} state=present"
-      with_items: [ "nginx", "git", "iptables", "ufw", "ruby", "ruby-rails"]
+      with_items: [ "nginx", "git", "iptables", "ufw", "ruby", "ruby-dev", \
+      "build-essential", "zlib1g-dev" ]
 
-    - name: Install unicorn
-      gem: name=unicorn state=present
+    - name: Install Ruby Gems
+      gem: name={{ item }} state=present user_install=no
+      with_items: [ "bundle", "rails", "unicorn" ]
 
     - file: dest=/var/www state=directory recurse=yes
     - name: Clone simple-sinatra-app
