@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Make sure temporary inventory file is removed before exit
+# Make sure temporary hosts file is removed before exit
 trap 'myexit; exit' EXIT SIGINT SIGQUIT
 myexit()
 {
-    [ -e $INVENTORY ] && rm $INVENTORY > /dev/null 2>&1
+    [ -e $HOSTSFILE ] && rm $HOSTSFILE > /dev/null 2>&1
 }
 
 # Check if Ansible is installed
@@ -26,8 +26,8 @@ fi
 [ -n "$2" ] && PORT="$2" || PORT="22"
 
 # Generate ansible inventory file
-INVENTORY=`mktemp`
-echo "testhost ansible_ssh_user=$USER ansible_ssh_host=$HOST ansible_ssh_port=$PORT" > $INVENTORY
+HOSTSFILE=`mktemp`
+echo "testhost ansible_ssh_user=$USER ansible_ssh_host=$HOST ansible_ssh_port=$PORT" > $HOSTSFILE
 
 # Configure the host
-ansible-playbook -i $INVENTORY -k rea.yml
+ansible-playbook -i $HOSTSFILE -k rea.yml
