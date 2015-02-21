@@ -29,6 +29,15 @@ iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
 
 # Limite SSH
 iptables -A INPUT -p tcp -m tcp --dport $SSH_PORT -j ACCEPT
+
+# NOTE:
+#   This is for vagrant test only
+#   Always allow TCP port 22
+#   Remove the following segment in production
+if [ "$SSH_PORT" != "22" ]; then
+    iptables -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+fi
+
 #iptables -A INPUT -p tcp -s IP_ADDRESS -m tcp --dport $SSH_PORT -j ACCEPT
 
 iptables -I INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
