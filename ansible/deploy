@@ -12,7 +12,7 @@ ansible --version > /dev/null 2>&1
 [ "$?" != "0" ] && { echo "Please install ansible first"; exit 1; }
 
 # Validate parameters
-[ -z "$1" ] && { echo "Usage: $0 <username@host>" exit 2; }
+[ -z "$1" ] && { echo "Usage: $0 <username@host> [ssh-port-num]" exit 2; }
 
 # Parse username and hostname
 if [[ "$1" == *"@"* ]]; then
@@ -22,12 +22,16 @@ else
     echo "Invalid username/hostname: $1"
     exit 3
 fi
-[ -z "$USER" -o -z "$HOST" ] && { echo "Invalid user/hostname: $1"; exit 4; }
-[ -n "$2" ] && PORT="$2" || PORT="22"
+[ -z "$USER" -o -z "$HOST" ] && { echo "Invalid user/hostname: $1"; exit 3; }
+
+# Parse SSH port num
+[ -n "$2" ] && SSH_PORT="$2" || SSH_PORT="22"
+export SSH_PORT=$SSH_PORT
 
 # Generate ansible inventory file
 HOSTSFILE=`mktemp`
-echo "testhost ansible_ssh_user=$USER ansible_ssh_host=$HOST ansible_ssh_port=$PORT" > $HOSTSFILE
+echo "testhost ansible_ssh_user=$USER ansible_ssh_host=$HOST ansible_ssh_port=$SSH_PORT" > $HOSTSFILE
 
 # Configure the host
-ansible-playbook -i $HOSTSFILE -k rea.yml
+echo "start..."
+ansible-playbook -i $HOSTSFILE -k rea-deploy.yml

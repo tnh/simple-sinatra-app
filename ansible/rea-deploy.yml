@@ -1,0 +1,104 @@
+---
+- name: Deploy simple-sinatra-app with NginX and Unicorn
+  sudo: True
+  hosts: testhost
+  vars:
+    nginx_user: nginx
+    nginx_group: web
+    app_name: simple-sinatra-app
+    app_dir: /var/www/simple-sinatra-app
+    app_git: git://github.com/tnh/simple-sinatra-app.git
+
+  tasks:
+    - name: "Add user group {{ nginx_group }}"
+      group: name={{ nginx_group }} state=present
+
+    - name: "Add user {{ nginx_user }}"
+      user: name="{{ nginx_user }}" shell=/bin/nologin groups="{{ nginx_group }}"
+
+    - name: Install repo file
+      copy: src=files/nginx.repo dest=/etc/yum.repos.d/nginx.repo
+      when: ansible_distribution == "CentOS"
+
+    - name: Install packages 'nginx', 'git', 'iptables'
+      action: "{{ ansible_pkg_mgr }} pkg={{ item }} state=present"
+      with_items: [ "nginx", "git", "iptables", "ruby" ]
+
+    - name: Install Ubuntu packages
+      apt: "pkg={{ item }} state=present"
+      with_items: ["build-essential", "aptitude", "ruby-dev", "zlib1g-dev", "iptables-persistent" ]
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Install CentOS packages
+      action: "{{ ansible_pkg_mgr }} pkg={{ item }} state=present"
+      with_items: [ "rubygems", "ruby-devel", "zlib-devel", "iptables-services" ]
+      when: ansible_distribution == "CentOS"
+
+    - name: Install CentOS development tools
+      action: "{{ ansible_pkg_mgr }} name='@Development tools' state=present"
+      when: ansible_distribution == "CentOS"
+
+    - name: Install Ruby Gems
+      gem: name={{ item }} state=present user_install=no
+      with_items: [ "bundle", "rails", "unicorn" ]
+
+    - name: Create /var/www folder
+      file: dest=/var/www state=directory recurse=yes
+
+    - name: Checkout simple-sinatra-app code
+      command: git clone --depth=1 {{ app_git }} chdir=/var/www creates={{ app_dir }}
+
+    - name: Cleanup
+      command: rm -rf {{ app_git }}/.git
+
+    - name: Create directories
+      file: dest={{ app_dir }}/{{ item }} state=directory recurse=yes
+      with_items: [ "log", "config", "tmp/sockets", "tmp/pids", "public" ]
+
+    - name: Configure nginx
+      template: src=files/nginx.conf dest=/etc/nginx/nginx.conf
+
+    - name: Configure unicorn app
+      template: src=files/unicorn.conf.rb dest={{ app_dir }}/config/unicorn.rb
+
+    - name: Configure unicorn system service
+      template: src=files/unicorn_server dest=/etc/init.d/unicorn_server owner=root group=root mode=755
+      notify:
+        - restart unicorn_server
+
+    - name: Bundle install
+      command: bundle install chdir={{ app_dir }}
+
+    #- name: Check unicorn PID
+    #  stat: path={{ app_dir }}/tmp/pids/unicorn.pid
+    #  register: unicorn_pid
+
+    #- name: Shutdown unicorn process if already running
+    #  shell: "cat {{ app_dir }}/tmp/pids/unicorn.pid | xargs kill -9"
+    #  when: unicorn_pid.stat.exists == True
+
+    #- name: Start unicorn
+    #  command: "unicorn -c {{ app_dir }}/config/unicorn.rb -E deployment -D"
+    #  notify:
+    #   - restart nginx
+
+    - name: Keep Ubuntu packages up-to-date
+      action: "{{ ansible_pkg_mgr }} upgrade=safe update_cache=yes"
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Keep CentOS packages up-to-date
+      yum: name=* state=latest
+      when: ansible_distribution == "CentOS"
+
+    - name: Apply iptables rules
+      script: "files/iptables.sh {{ ansible_distribution }} {{ lookup('env', 'SSH_PORT') }}"
+
+    - name: Apply kernel tweaks for security
+      script: files/sysctl.sh
+
+  handlers:
+    - name: restart nginx
+      service: name=nginx state=restarted
+    - name: restart unicorn_server
+      service: name=unicorn_server state=restarted
+      notify: restart nginx
