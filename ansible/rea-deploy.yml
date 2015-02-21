@@ -68,19 +68,8 @@
 
     - name: Bundle install
       command: bundle install chdir={{ app_dir }}
-
-    #- name: Check unicorn PID
-    #  stat: path={{ app_dir }}/tmp/pids/unicorn.pid
-    #  register: unicorn_pid
-
-    #- name: Shutdown unicorn process if already running
-    #  shell: "cat {{ app_dir }}/tmp/pids/unicorn.pid | xargs kill -9"
-    #  when: unicorn_pid.stat.exists == True
-
-    #- name: Start unicorn
-    #  command: "unicorn -c {{ app_dir }}/config/unicorn.rb -E deployment -D"
-    #  notify:
-    #   - restart nginx
+      environment:
+        PATH: "{{ ansible_env.PATH }}:/usr/local/bin"
 
     - name: Keep Ubuntu packages up-to-date
       action: "{{ ansible_pkg_mgr }} upgrade=safe update_cache=yes"

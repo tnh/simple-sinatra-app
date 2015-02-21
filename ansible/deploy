@@ -33,5 +33,4 @@ HOSTSFILE=`mktemp /tmp/hostfile.XXXX`
 echo "testhost ansible_ssh_user=$USER ansible_ssh_host=$HOST ansible_ssh_port=$SSH_PORT" > $HOSTSFILE
 
 # Configure the host
-echo "start..."
 ansible-playbook -i $HOSTSFILE -k rea-deploy.yml
