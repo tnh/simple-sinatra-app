@@ -29,7 +29,7 @@ fi
 export SSH_PORT=$SSH_PORT
 
 # Generate ansible inventory file
-HOSTSFILE=`mktemp`
+HOSTSFILE=`mktemp /tmp/hostfile.XXXX`
 echo "testhost ansible_ssh_user=$USER ansible_ssh_host=$HOST ansible_ssh_port=$SSH_PORT" > $HOSTSFILE
 
 # Configure the host
