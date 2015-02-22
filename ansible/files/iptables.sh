@@ -7,7 +7,7 @@
 # Usage: iptables.sh <Linux-Dist> <ssh-port-num-to-allow>
 #        examples: ./iptables Ubuntu 22
 #                  ./iptables CentOS 1234
-#
+# Tested on: CentOS 7.0, Ubuntu 14.04
 
 iptables -F
 if [ "$?" != "0" ]; then
@@ -26,33 +26,30 @@ iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
 iptables -A INPUT -i lo -j ACCEPT
 # Allow web traffic
 iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
-
-# Limite SSH
+# Allow SSH
 iptables -A INPUT -p tcp -m tcp --dport $SSH_PORT -j ACCEPT
 
 # NOTE:
-#   This is for vagrant test only
 #   Always allow TCP port 22
+#   This is for vagrant test only
 #   Remove the following segment in production
 if [ "$SSH_PORT" != "22" ]; then
     iptables -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
 fi
 
-#iptables -A INPUT -p tcp -s IP_ADDRESS -m tcp --dport $SSH_PORT -j ACCEPT
-
 iptables -I INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-
+iptables -P FORWARD DROP
 iptables -P OUTPUT ACCEPT
 iptables -P INPUT DROP
 iptables -L -n
 
 # Save persistent configurations
-if [ "$DIST" == "CentOS" ]; then
+if [ "$DIST" = "CentOS" ]; then
    iptables-save | tee /etc/sysconfig/iptables-config
    chkconfig iptables on
    service iptables save
 fi
 
-if [ "$DIST" == "Ubuntu" ]; then
+if [ "$DIST" = "Ubuntu" ]; then
     iptables-save | tee /etc/iptables/rules.v4
 fi
