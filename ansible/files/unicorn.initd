@@ -41,6 +41,10 @@ start)
 	sig 0 && echo >&2 "Already running" && exit 0
 	$CMD
 	;;
+status)
+	sig 0 && echo >&2 "* unicorn_server is running" && exit 0
+	echo >&2 "* unicorn_server is not running" && exit 3
+	;;
 stop)
 	sig QUIT && exit 0
 	echo >&2 "Not running"

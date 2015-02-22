@@ -2,7 +2,7 @@
 # note the trailing slash in this example
 @dir = "{{ app_dir }}"
 
-worker_processes 2
+worker_processes 3
 working_directory @dir
 
 timeout 30
