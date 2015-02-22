@@ -15,18 +15,21 @@ examples:
 - It makes sure all packages installed are up-to-date.
 - It downloads and install essential packages: nginx, ruby, rails, gem, unicorn and etc.
 - It creates new user 'nginx' and new group 'web', set to nologin shell for Nginx worker process.
-- It checkout sample-sinatra-app code from repository.
+- It deploys sample-sinatra-app from repository.
 - It configures Nginx and Unicorn for sample-sinatra-app.
-- It apply iptables rules and kernel tweaks to lock down the server.
- 
+- It apply iptables rules to restrict incoming traffic for WEB and SSH only.
+- It tunes kernel parameters for security and performance.
+- It protect SSH with fail2ban.
+
 ###Tested On
 - CentOS 7 x86_64
 - Ubuntu 14.04 x86_64
 
 ### Ideas For Improvement
-- Parameterize the deployment to handle multi-site configurations and SSH key authentications.
+- Run Unicorn under supervised/daemontools to improve HA.
+- Parameterize the deploy script to handle multi-site configurations and SSH key authentications.
 - Separate the general components (Ruby Gems, Nginx, Unicorn) and hande the configuration appropriately.
-- Make Ansible playbook to handle different Linux distributions in a single playbook.
-- Reinforce security, adding allowed IP ranges, user/service audit.
+- Make Ansible playbook to handle different Linux distributions.
 - Manage Ruby/Rubygems versions appropriately.
-- Handle log rotations.
+- Reinforce security with SELinux.
+- Fine tune kernel parameters.
