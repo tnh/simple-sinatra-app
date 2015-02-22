@@ -43,20 +43,29 @@
       with_items: [ "bundle", "rails", "unicorn" ]
 
     - name: Create /var/www folder
-      file: dest=/var/www state=directory recurse=yes
+      file: dest=/var/www state=directory recurse=yes mode=755
 
     - name: Checkout simple-sinatra-app code
       command: git clone --depth=1 {{ app_git }} chdir=/var/www creates={{ app_dir }}
 
-    - name: Cleanup
+    - name: Clean up git directory
       command: rm -rf {{ app_git }}/.git
 
     - name: Create directories
       file: dest={{ app_dir }}/{{ item }} state=directory recurse=yes
-      with_items: [ "log", "config", "tmp/sockets", "tmp/pids", "public" ]
+      with_items: [ "log", "config", "public" ]
+
+    - name: Create tmp directories
+      file: dest={{ app_dir }}/{{ item }} state=directory recurse=yes mode=1777
+      with_items: [ "tmp/sockets", "tmp/pids" ]
 
     - name: Configure nginx
       template: src=files/nginx.conf dest=/etc/nginx/nginx.conf
+      notify:
+        restart nginx
+
+    - name: Enable nginx service
+      service: name=nginx enabled=yes
 
     - name: Configure unicorn app
       template: src=files/unicorn.conf.rb dest={{ app_dir }}/config/unicorn.rb
@@ -64,26 +73,44 @@
     - name: Configure unicorn system service
       template: src=files/unicorn_server dest=/etc/init.d/unicorn_server owner=root group=root mode=755
       notify:
-        - restart unicorn_server
+        restart unicorn_server
+
+    - name: Enable unicorn service
+      service: name=unicorn_server enabled=yes
+
+    #- name: Add Unicorn Service (Ubuntu)
+    #  command: update-rc.d unicorn_server defaults
+    #  when: ansible_distribution == "Ubuntu"
+
+    #- name: Add Unicorn Service (CentOS)
+    #  command: chkconfig --add unicorn_server
+    #  when: ansible_distribution == "CentOS"
 
     - name: Bundle install
       command: bundle install chdir={{ app_dir }}
       environment:
         PATH: "{{ ansible_env.PATH }}:/usr/local/bin"
 
-    - name: Keep Ubuntu packages up-to-date
+    - name: Update Ubuntu packages
       action: "{{ ansible_pkg_mgr }} upgrade=safe update_cache=yes"
       when: ansible_distribution == "Ubuntu"
 
-    - name: Keep CentOS packages up-to-date
+    - name: Update CentOS packages
       yum: name=* state=latest
       when: ansible_distribution == "CentOS"
 
     - name: Apply iptables rules
       script: "files/iptables.sh {{ ansible_distribution }} {{ lookup('env', 'SSH_PORT') }}"
 
-    - name: Apply kernel tweaks for security
-      script: files/sysctl.sh
+    - name: Install sysctl config file
+      copy: src=files/sysctl.conf dest=/etc/sysctl.d/20-rea.conf owner=root group=root mode=0644
+
+    - name: Harden Kernel
+      command: sysctl -p
+      ignore_errors: yes
+      # VM on some container based hypervisor (like OpenVZ) gives permission
+      # error when applying certain kernel settings. This is a hypervisor
+      # issue, so ignore it for here.
 
   handlers:
     - name: restart nginx
