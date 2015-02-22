@@ -20,19 +20,23 @@
       copy: src=files/nginx.repo dest=/etc/yum.repos.d/nginx.repo
       when: ansible_distribution == "CentOS"
 
-    - name: Install packages 'nginx', 'git', 'iptables'
-      action: "{{ ansible_pkg_mgr }} pkg={{ item }} state=present"
-      with_items: [ "nginx", "git", "iptables", "ruby" ]
-
     - name: Install Ubuntu packages
       apt: "pkg={{ item }} state=present"
-      with_items: ["build-essential", "aptitude", "ruby-dev", "zlib1g-dev", "iptables-persistent" ]
+      with_items: [ "nginx", "git", "iptables", "ruby", "build-essential",
+      "aptitude", "ruby-dev", "zlib1g-dev", "iptables-persistent", "fail2ban" ]
       when: ansible_distribution == "Ubuntu"
 
     - name: Install CentOS packages
       action: "{{ ansible_pkg_mgr }} pkg={{ item }} state=present"
-      with_items: [ "rubygems", "ruby-devel", "zlib-devel", "iptables-services" ]
+      with_items: [ "nginx", "git", "iptables", "ruby", "rubygems",
+      "ruby-devel", "zlib-devel", "iptables-services", "epel-release", "fail2ban" ]
       when: ansible_distribution == "CentOS"
+
+    - name: Remove firewalld
+      action: "{{ ansible_pkg_mgr }} pkg={{ item }} state=absent"
+      with_items: [ "firewalld" ]
+      when: ansible_distribution == "CentOS"
+      # We iptables directly, avoid firewalld adding chains
 
     - name: Install CentOS development tools
       action: "{{ ansible_pkg_mgr }} name='@Development tools' state=present"
@@ -49,7 +53,7 @@
       command: git clone --depth=1 {{ app_git }} chdir=/var/www creates={{ app_dir }}
 
     - name: Clean up git directory
-      command: rm -rf {{ app_git }}/.git
+      command: "rm -rf {{ app_dir }}/.git*"
 
     - name: Create directories
       file: dest={{ app_dir }}/{{ item }} state=directory recurse=yes
@@ -64,27 +68,17 @@
       notify:
         restart nginx
 
-    - name: Enable nginx service
-      service: name=nginx enabled=yes
-
     - name: Configure unicorn app
       template: src=files/unicorn.conf.rb dest={{ app_dir }}/config/unicorn.rb
 
     - name: Configure unicorn system service
-      template: src=files/unicorn_server dest=/etc/init.d/unicorn_server owner=root group=root mode=755
+      template: src=files/unicorn.initd dest=/etc/init.d/unicorn_server owner=root group=root mode=755
       notify:
         restart unicorn_server
 
-    - name: Enable unicorn service
-      service: name=unicorn_server enabled=yes
-
-    #- name: Add Unicorn Service (Ubuntu)
-    #  command: update-rc.d unicorn_server defaults
-    #  when: ansible_distribution == "Ubuntu"
-
-    #- name: Add Unicorn Service (CentOS)
-    #  command: chkconfig --add unicorn_server
-    #  when: ansible_distribution == "CentOS"
+    - name: Configure unicorn log rotation
+      template: src=files/unicorn.logrotate dest=/etc/logrotate.d/unicorn
+      # logrotate is not a daemon, no need to reload its configuration
 
     - name: Bundle install
       command: bundle install chdir={{ app_dir }}
@@ -110,11 +104,22 @@
       ignore_errors: yes
       # VM on some container based hypervisor (like OpenVZ) gives permission
       # error when applying certain kernel settings. This is a hypervisor
-      # issue, so ignore it for here.
+      # issue, so ignore it here.
+
+    - name: Secure SSH with fail2ban
+      copy: src=files/fail2ban.jail dest=/etc/fail2ban/jail.local owner=root group=root mode=0644
+
+    - name: Enable fail2ban service
+      service: name=fail2ban enabled=yes state=restarted
+
+    - name: Start unicorn service
+      service: name=unicorn_server enabled=yes
+
+    - name: Enable nginx service
+      service: name=nginx enabled=yes
 
   handlers:
-    - name: restart nginx
-      service: name=nginx state=restarted
     - name: restart unicorn_server
       service: name=unicorn_server state=restarted
-      notify: restart nginx
+    - name: restart nginx
+      service: name=nginx state=restarted
