@@ -26,9 +26,9 @@ examples:
 - Ubuntu 14.04 x86_64
 
 ###Known Issues
-- With container based hypervisor (such as OpenVZ), certain kernel running time parameter settins will fail with permission error. It's hypervisor issue, and it will be ignored.
+- With container based hypervisor (such as OpenVZ), certain kernel running time parameter settings will fail with permission error. It's hypervisor issue, and the error will be ignored in playbook.
 - TCP port 22 is always allowed in iptables even your new node SSH sevice is on a different port. This is for debugging the code with Vagrant. Please remove relavent section in iptables.sh for production.
-- If running with SELinux, extra configuration is required for Nginx process to access Unicorn's doamin socket file. Otherwise it will get permission error.
+- If running with SELinux, extra configuration is required for Nginx process to access Unicorn's domain socket file. Otherwise it will get permission error.
 
 ### Ideas For Improvement
 - Run Unicorn under Supervisord/Daemontools to improve HA.
