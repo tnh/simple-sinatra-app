@@ -5,7 +5,7 @@ Infrastructure Operations Pre-interview test
 Provision a new application server and deploy the following application
 -------
 A development team wants you to deploy this simple web app. 
-- come up with a way to deploy this app and write configuration-as-code to deploy it.
+- come up with a way to deploy this app and write configuration-as-code to deploy it
 - ensure that the instance is locked down and secure 
 - suggest ways to do ongoing deployments on this application
 
@@ -13,6 +13,7 @@ A development team wants you to deploy this simple web app.
 Expected output
 -------------
 - A method of being able to do repeatable deployments of the simple web application
+- Share this output with the hiring manager - via a link to a git project, text file, or artifact  
 
 
  
