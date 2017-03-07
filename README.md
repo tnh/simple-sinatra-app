@@ -4,17 +4,16 @@ Infrastructure Operations Pre-interview test
 
 Provision a new application server and deploy the following application
 -------
-write configuration as code recipes in chef / puppet / ansible / babushka  / shell scripts to
-- deploy this application onto a vanilla OS image (Centos/Fedora/Ubuntu/Debian/RHEL)
-- use apache modpassenger  / unicorn nginx or whatever you like to serve up the application on port 80
-- provision a web server with ruby to deploy the packaged Sinatra application
-- ensure that the server is locked down and secure
-- deploy the hello world application
+A development team wants you to deploy this simple web app. 
+- come up with a way to deploy this app and write configuration-as-code to deploy it.
+- ensure that the instance is locked down and secure 
+- suggest ways to do ongoing deployments on this application
 
 
 Expected output
 -------------
-- chef / puppet  / ansible / babushka  / shell scripts that we can use to deploy the following application
+- A method of being able to do repeatable deployments of the simple web application
+
 
  
 
