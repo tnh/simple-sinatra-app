@@ -1,0 +1,9 @@
+PassengerAppRoot /var/www/simple-sinatra-app/public
+<VirtualHost *:80>
+    ServerName <%= @fqdn %>
+    DocumentRoot /var/www/simple-sinatra-app/public
+    <Directory /var/www/simple-sinatra-app/public>
+        AllowOverride all
+        Options -MultiViews
+    </Directory>
+</VirtualHost>

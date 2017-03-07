@@ -1,0 +1,10 @@
+*filter
+:INPUT DROP [13:2613]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [49:5900]
+-A INPUT -i lo -j ACCEPT
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -p tcp -m tcp -m state --state NEW --dport 22 -j LOG
+-A INPUT -p tcp -m tcp -m multiport --dports 22,80 -j ACCEPT
+COMMIT
