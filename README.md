@@ -13,8 +13,8 @@ A development team wants you to deploy this simple web app.
 Expected output
 -------------
 - A method of being able to do repeatable deployments of the simple web application
+- Within a readme or similar, articulate the reasons for the decisions you made 
 - Share this output with the hiring manager - via a link to a git project, text file, or artifact  
-
 
  
 
