@@ -1,4 +1,4 @@
-An old site performance pre-interview task
+Infrastructure Operations Pre-interview test
 =============
 
 
@@ -32,8 +32,3 @@ http://www.modrails.com/documentation/Users%20guide%20Apache.html
 Unicorn nginx:
 http://sirupsen.com/setting-up-unicorn-with-nginx/
 
-
-
-I'm interviewing for REA Group!
-=============
-If you're here for an REA interview, please see https://github.com/rea-cruitment/simple-sinatra-app
