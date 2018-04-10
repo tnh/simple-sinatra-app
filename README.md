@@ -5,7 +5,8 @@ Infrastructure Operations Pre-interview test
 Provision a new application server and deploy the following application
 -------
 A development team wants you to deploy this simple web app. 
-- come up with a way to deploy this app and write configuration-as-code to deploy it
+- come up with a way to deploy this app and write configuration-as-code to deploy it.
+- Use AWS/Cloudformation to deploy this. You can create a free-tier AWS account.
 - ensure that the instance is locked down and secure 
 - suggest ways to do ongoing deployments on this application
 
@@ -22,7 +23,7 @@ Expected output
 To get this application working locally
 =============
 
-    git clone git://github.com/tnh/simple-sinatra-app.git
+    git clone git@github.com:AssemblyPayments/simple-sinatra-app.git
     shell $ bundle install
     shell $ bundle exec rackup
 
